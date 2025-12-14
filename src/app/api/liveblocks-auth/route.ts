@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Liveblocks } from "@liveblocks/node";
 import { ConvexHttpClient } from "convex/browser";
 import { auth, currentUser } from "@clerk/nextjs/server";
