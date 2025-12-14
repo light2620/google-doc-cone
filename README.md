@@ -1,172 +1,98 @@
-# Google Docs Clone
+Google Docs — Collaborative Editor
 
-A collaborative document editor built with Next.js, featuring real-time collaboration, authentication, and organizational support. This application provides a Google Docs-like experience with rich text editing, live cursors, comments, and document management.
+A collaborative rich-text document editor built with modern web tools (Next.js, Liveblocks, Convex). Supports real-time multi-user editing, persistent documents, and a polished UI.
 
-## Features
+**Live features & highlights**
 
-- **Real-time Collaboration**: Multiple users can edit documents simultaneously with live cursors and instant updates
-- **Rich Text Editor**: Powered by TipTap with support for headings, formatting, tables, images, and more
-- **Authentication**: Secure user authentication with Clerk, supporting organizations and personal accounts
-- **Document Management**: Create, edit, delete, and organize documents with search functionality
-- **Organizational Support**: Share documents within organizations and manage team collaboration
-- **Responsive Design**: Modern UI built with Tailwind CSS and shadcn/ui components
-- **Template Gallery**: Pre-built document templates for common use cases
+- Real-time collaborative editing with presence and cursors
+- Rich-text editing powered by TipTap / Quill-style editor
+- Document persistence and server-side APIs via Convex
+- Authentication and user management (Clerk)
+- Responsive UI built with Tailwind CSS and shadcn/ui components
+- Docker-ready for local full-stack testing
 
-## Tech Stack
+## Tech stack
 
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Backend**: Convex for real-time database and API
-- **Authentication**: Clerk with organization support
-- **Real-time Collaboration**: Liveblocks for collaborative editing
-- **Editor**: TipTap with collaborative extensions
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **State Management**: Zustand
+- Framework: Next.js + React + TypeScript
+- Real-time: Liveblocks (presence & collaborative primitives)
+- Backend / DB: Convex (serverless backend & data model)
+- Auth: Clerk (authentication and user profiles)
+- Editor: TipTap (rich-text editing)
+- Styling: Tailwind CSS
+- Utilities: date-fns, nanoid, clsx, lucide-react
 
-## Prerequisites
+## Quickstart (local)
 
-Before setting up the project, ensure you have:
+Prerequisites: Node.js 18+, npm (or pnpm/yarn), Convex CLI, Liveblocks & Clerk accounts for production features.
 
-- A Convex account
-- A Clerk account
-- A Liveblocks account
-
-## Setup Instructions
-
-### 1. Clone and Install Dependencies
+1. Clone
 
 ```bash
-git clone https://github.com/Davronov-Alimardon/google-docs.git
-cd google-docs-clone
-npm install
+git clone <your-repo-url>
+cd google-docs
 ```
 
-> **Note**: Use `npm install --legacy-peer-deps` flag if you encounter version conflicts during installation.
+2. Install dependencies
 
-### 2. Environment Variables
+```bash
+npm install
+# or pnpm install
+```
 
-Create a `.env.local` file in the root directory with the following variables:
+3. Environment variables
 
-```env
+Create a `.env.local` in the project root and add the following (example keys):
+
+```
 # Convex
-NEXT_PUBLIC_CONVEX_URL=your-convex-deployment-url
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
+CONVEX_DEPLOYMENT=dev:your-deployment
+NEXT_PUBLIC_CONVEX_URL=https://yourconvex.convex.cloud
 
 # Liveblocks
-LIVEBLOCKS_SECRET_KEY=your-liveblocks-secret-key
+NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY=pk_live_...
+LIVEBLOCKS_SECRET_KEY=sk_...
+
+# Clerk (if used)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+CLERK_SECRET_KEY=...
 ```
 
-### 3. Convex Setup
+4. Start Convex (if developing with Convex backend)
 
-#### Install Convex CLI
-```bash
-npm install -g convex
-```
-
-#### Initialize Convex
 ```bash
 npx convex dev
+# keep this running in its terminal
 ```
 
-#### Configure Authentication
-1. Go to your Convex dashboard
-2. Navigate to Settings > Authentication
-3. Add Clerk as an authentication provider
-4. Use your Clerk domain: `https://your-clerk-domain.clerk.accounts.dev`
-5. Set the application ID to: `convex`
-
-#### Deploy Convex Functions
-```bash
-npx convex deploy
-```
-
-### 4. Clerk Setup
-
-#### Create Clerk Application
-1. Sign up at [clerk.com](https://clerk.com)
-2. Create a new application
-3. Enable organizations in your Clerk dashboard:
-   - Go to Configure > Organizations
-   - Enable organizations feature
-   - Configure organization settings as needed
-
-#### Configure JWT Template
-1. In your Clerk dashboard, go to Configure > JWT Templates
-2. Create a new template called `convex`
-3. Add the following claims:
-```json
-{
-  "aud": "convex",
-  "name": "{{user.full_name}}",
-  "email": "{{user.primary_email_address}}",
-  "picture": "{{user.image_url}}",
-  "nickname": "{{user.username}}",
-  "given_name": "{{user.first_name}}",
-  "updated_at": "{{user.updated_at}}",
-  "family_name": "{{user.last_name}}",
-  "phone_number": "{{user.primary_phone_number}}",
-  "email_verified": "{{user.email_verified}}",
-  "organization_id": "{{org.id}}",
-  "phone_number_verified": "{{user.phone_number_verified}}"
-}
-```
-
-#### Update Convex Auth Config
-Update `convex/auth.config.ts` with your Clerk domain:
-```typescript
-export default {
-  providers: [
-    {
-      domain: "https://your-clerk-domain.clerk.accounts.dev",
-      applicationID: "convex"
-    }
-  ]
-}
-```
-
-### 5. Liveblocks Setup
-
-#### Create Liveblocks Project
-1. Sign up at [liveblocks.io](https://liveblocks.io)
-2. Create a new project
-3. Get your public and secret keys from the dashboard
-
-### 6. Run the Development Server
+5. Run the app
 
 ```bash
 npm run dev
+# Open http://localhost:3000
 ```
 
-The application will be available at `http://localhost:3000`.
 
-## Project Structure
 
-```
-src/
-├── app/                   # Next.js app directory
-│   ├── (home)/            # Home page and document listing
-│   ├── api/               # API routes
-│   ├── documents/         # Document editing interface
-│   └── layout.tsx         # Root layout
-├── components/            # Reusable components
-│   ├── ui/                # shadcn/ui components
-│   └── ...                # Custom components
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utility functions
-└── store/                 # Zustand stores
+## Project structure (high level)
 
-convex/
-├── documents.ts          # Document CRUD operations
-├── schema.ts             # Database schema
-└── auth.config.ts        # Authentication configuration
-```
+- `app/` — Next.js app routes and UI
+- `src/` — app source (components, hooks, store)
+- `convex/` — Convex backend functions and schema
+- `public/` — static assets
+
+## Environment notes
+
+- Convex provides the serverless backend and realtime subscriptions; set `NEXT_PUBLIC_CONVEX_URL` to your Convex deployment.
+- Liveblocks requires a server-side auth endpoint (`/api/liveblocks-auth`) and a public key injected into the client.
+- Clerk keys are required for auth features (optional if you use another auth provider).
+
+## Scripts
+
+- `npm run dev` — Start Next.js dev server
+- `npm run build` — Build for production
+- `npm start` — Start production server
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+Contributions welcome — open issues or PRs. Please run linters and tests (if present) before submitting.
+
